@@ -36,8 +36,6 @@
 
 <script>
 import qs from 'qs'
-import { inject } from 'vue'
-const axios = inject('axios')
 export default {
   data () {
     return {
@@ -59,7 +57,7 @@ export default {
   methods: {
     fetchData () {
       const query = Object.assign({}, this.user, this.pager)
-      axios.get('/api/user', {
+      this.axios.get('/api/user', {
         params: query
       }).then(res => {
         const temp = res.data
@@ -71,7 +69,7 @@ export default {
       const data = {
         ids: [id]
       }
-      axios.delete('/api/user', {
+      this.axios.delete('/api/user', {
         params: data,
         paramsSerializer: params => {
           return qs.stringify(params, { indices: false })
@@ -84,6 +82,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.table-context {
+    max-height: 200px;
+    overflow-y: scroll;
+}
 </style>

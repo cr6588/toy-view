@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import { inject } from 'vue'
-const axios = inject('axios')
 export default {
   data () {
     return {
@@ -24,7 +22,7 @@ export default {
   },
   methods: {
     login () {
-      axios.post('/api/login', this.user).then(res => {
+      this.axios.post('/api/login', this.user).then(res => {
         if (res.data !== 'succ') {
           alert(res.data)
           return
@@ -33,7 +31,7 @@ export default {
       })
     },
     register () {
-      axios.post('/api/register', this.user).then(res => {
+      this.axios.post('/api/register', this.user).then(res => {
         alert(res.data)
       })
     }
