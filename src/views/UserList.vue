@@ -6,31 +6,29 @@
     </div>
 
   <input type="button" @click="fetchData" value="搜索">
-  <div class="table-context">
-      <table>
-          <tr>
-              <td>id</td>
-              <td>username</td>
-              <td>name</td>
-              <td>operate</td>
-          </tr>
-        <tr v-for="u in list" :key="u.id">
-          <td>{{ u.id }}</td>
-          <td>{{ u.username }}</td>
-          <td>{{ u.name }}</td>
-          <td><input type="button" @click="del(u.id)" value="删除"></td>
-        </tr>
-      </table>
-  </div>
-  <a @click="pager.current--;fetchData()">上一页</a>当前页{{ pager.current }},<a @click="pager.current++;fetchData()">下一页</a>,
-  每页<select v-model="pager.size" @change="fetchData">
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="50">50</option>
-  <option value="100">100</option>
-  <option value="200">200</option>
-  </select>,
-  总数{{ pager.total }}
+  <el-table :data="list" stripe style="width: 100%" v-loading="loading" height="250">
+    <el-table-column prop="id" label="id" width="180" />
+    <el-table-column prop="username" label="username" width="180" />
+    <el-table-column prop="name" label="name" width="180" />
+    <el-table-column label="operate">
+      <template #default="scope">
+        <el-button size="small" @click="del(scope.row.id)"
+          >删除</el-button
+        >
+      </template>
+    </el-table-column>
+  </el-table>
+  <el-pagination
+    :page-sizes="[10, 20, 50, 100, 200]"
+    background
+    layout="prev, pager, next, jumper, total, sizes, "
+    :total="pager.total"
+    v-model:page-size="pager.size"
+    v-model:currentPage="pager.current"
+    @size-change="fetchData"
+    @current-change="fetchData"
+  >
+  </el-pagination>
   </div>
 </template>
 
@@ -39,6 +37,7 @@ import qs from 'qs'
 export default {
   data () {
     return {
+      loading: false,
       user: {
         usernameLike: '',
         nameLike: ''
@@ -56,19 +55,21 @@ export default {
   },
   methods: {
     fetchData () {
+      this.loading = true
       const query = Object.assign({}, this.user, this.pager)
       this.axios.get('/api/user', {
         params: query
       }).then(res => {
-        const temp = res.data
-        this.list = temp.body
-        this.pager = temp.pager
+        this.list = res.body
+        this.pager = res.pager
+        this.loading = false
       })
     },
     del (id) {
       const data = {
         ids: [id]
       }
+      this.loading = true
       this.axios.delete('/api/user', {
         params: data,
         paramsSerializer: params => {
